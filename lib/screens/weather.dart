@@ -2,6 +2,7 @@ import 'dart:convert';
 import '../model/weather_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'loading.dart';
 
 class Weather extends StatefulWidget {
   final String cityName;
@@ -11,20 +12,6 @@ class Weather extends StatefulWidget {
   @override
   State<Weather> createState() => _WeatherState();
 }
-
-// Future<Map<String, dynamic>> fetchJSONData() async {
-//   final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
-//
-//   if (response.statusCode == 200) {
-//     print("okkkkk");
-//     print(response.body);
-//     return json.decode(response.body);
-//   } else {
-//     print("not okkkkk");
-//     throw Exception('Failed to load JSON data');
-//   }
-// }
-
 
 class _WeatherState extends State<Weather> {
   WeatherModel? weatherData;
@@ -39,7 +26,7 @@ class _WeatherState extends State<Weather> {
 
   Future<void> fetchWeatherData() async {
     final response = await http.get(Uri.parse('https://api.openweathermap.org/data/2.5/weather?q=${widget.cityName}&appid=2183f46ee5d8c23c3290ac7cd4433027'));
-
+    await Future.delayed(Duration(seconds: 2));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       setState(() {
@@ -51,6 +38,20 @@ class _WeatherState extends State<Weather> {
       }else if(weatherData!.description.contains("clear")){
         whatIsWeather="images/clearsky.jpg";
         icon=Icon(Icons.sunny);
+      }else if(weatherData!.description.contains("ain")){
+        whatIsWeather="images/rain.jpg";
+        icon=Icon(Icons.umbrella);
+      }else if(weatherData!.description.contains("tunder")){
+        whatIsWeather="images/thunderstorm.jpg";
+        icon=Icon(Icons.thunderstorm_outlined);
+      }else if(weatherData!.description.contains("mist")){
+        whatIsWeather="images/mist.jpg";
+        icon=Icon(Icons.foggy);
+      }else if(weatherData!.description.contains("haze")){
+        whatIsWeather="images/haze.jpg";
+        icon=Icon(Icons.foggy);
+      }else{
+        icon = Icon(Icons.favorite_border_outlined);
       }
     } else {
       Navigator.pop(context,"invalid");
@@ -61,40 +62,135 @@ class _WeatherState extends State<Weather> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Weather Page'),
-      // ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
             image:
             DecorationImage(image: AssetImage("${whatIsWeather}"),fit: BoxFit.cover)),
+
         child: Center(
-          child :Container(
-            height: 200,
-            width: 250,
-            decoration: BoxDecoration(color: Colors.white60),
-            child: weatherData != null
-                ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-              Flex(
-              direction: Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('${weatherData!.cityName}',style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700),),
-                icon,
-              ],),
-                Text('Temperature: ${weatherData!.temperature}',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
-                Text('${weatherData!.description}',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
-              ],
-            )
-                : CircularProgressIndicator(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 10,),
+              Container(
+                height: 200,
+                width: 250,
+                decoration: BoxDecoration(color: Colors.white70),
+                child: weatherData != null
+                    ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                  Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text('${weatherData!.cityName}',style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700),),
+                      Text('${weatherData!.temperature}°C',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
+                    ],),
+                  SizedBox(height: 15,),
+                    Text('wind speed: ${weatherData!.wind}m/s',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
+                    SizedBox(height: 5,),
+                    Flex(
+                      direction: Axis.horizontal,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text('min: ${weatherData!.temperatureMin}°C',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
+                        Text('max: ${weatherData!.temperatureMax}°C',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
+                      ],),
+
+                    SizedBox(height: 15,),
+                  Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    icon,
+                    Text('${weatherData!.description}',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
+                    icon,
+                  ],),
+                  ],
+                )
+                    :
+                Loading(),
+              ),
+              SizedBox(height: 10,),
+              ElevatedButton(
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                style: ButtonStyle(backgroundColor: MaterialStatePropertyAll<Color>(Colors.white60),),
+                  child: Text("go home",style: TextStyle(color: Colors.black,),),
+              )
+            ],
           ),
-          )
+        )
 
       ),
     );
   }
+
+
+
 }
+
+// class NewWidget extends StatelessWidget {
+//   const NewWidget({
+//     super.key,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // Icons.sunny;
+//     // Icons.snowing;
+//     // Icons.cloud;
+//     //
+//     // return CircularProgressIndicator();
+//     return Container(
+//     //   child: AnimatedCrossFade(
+//     //     firstChild: Icons(Icons.sunny),
+//     //     secondChild: Icons.cloud,
+//     //     duration: Duration(seconds: 1),
+//     //     crossFadeState: CrossFadeState.showFirst,
+//     //   ),
+//     child: AnimatedSwitcher(
+//       duration: Duration(seconds: 2),
+//       child: ,
+//     ),
+//
+//
+//     )
+//   }
+// }
+
+// class IconTransition extends StatefulWidget {
+//   @override
+//   _IconTransitionState createState() => _IconTransitionState();
+// }
+//
+// class _IconTransitionState extends State<IconTransition> {
+//   int _currentIndex = 0;
+//   final List<IconData> _icons = [
+//     Icons.sunny,
+//     Icons.snowing,
+//     Icons.cloud,
+//   ];
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return AnimatedSwitcher(
+//       duration: Duration(seconds: 1),
+//       transitionBuilder: (Widget child, Animation<double> animation) {
+//         return ScaleTransition(
+//           scale: animation,
+//           child: child,
+//         );
+//       },
+//       child: Icon(
+//         _icons[_currentIndex],
+//         key: ValueKey(_icons[_currentIndex]),
+//         size: 50,
+//       ),
+//     );
+//   }
+// }
