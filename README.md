@@ -1,3 +1,5 @@
+You can visit the presentation website with a basic video from this link: https://edazeynepu.github.io/weather_app_flutter/presentation/weather.html
+<hr/>
 # weather_app_flutter
 
 A new Flutter project.
